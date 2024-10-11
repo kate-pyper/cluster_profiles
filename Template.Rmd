@@ -1,0 +1,88 @@
+---
+title: "GP Cluster Profiles"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    css: phs_style.css
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(crosstalk)
+library(tidyverse)
+```
+
+Information {data-icon="fa-info-circle"}
+================================================================================
+
+We could put some high level summaries on this page (e.g. biggest changes since last year, or biggest difference to HSCP - although note that for some clusters in Lothian they compare to HB since cluster is essentially just the HSCP).
+
+Notes could either go on this page, or could go on a separate "Notes" Page.
+
+<!-- Cluster Level Tabs -->
+
+Demographics {data-navmenu="Cluster Level Data" data-navmenu-icon="fa-cogs"}
+================================================================================
+
+
+Unscheduled Care {data-navmenu="Cluster Level Data"}
+================================================================================
+
+
+Outpatient Appointments {data-navmenu="Cluster Level Data"}
+================================================================================
+
+
+Prescribing {data-navmenu="Cluster Level Data"}
+================================================================================
+
+
+National Therapeutic Indicators {data-navmenu="Cluster Level Data"}
+================================================================================
+
+<!-- Practice Level Tabs -->
+
+Demographics {data-navmenu="Practice Level Data" data-navmenu-icon="fa-cog"}
+================================================================================
+
+
+Unscheduled Care {data-navmenu="Practice Level Data"}
+================================================================================
+
+
+Outpatient Appointments {data-navmenu="Practice Level Data"}
+================================================================================
+
+
+Prescribing {data-navmenu="Practice Level Data"}
+================================================================================
+
+
+National Therapeutic Indicators {data-navmenu="Practice Level Data"}
+================================================================================
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+
