@@ -4,6 +4,7 @@
 library(tidyverse)
 library(data.table)
 source("Read in data.R")
+source("Render Functions.R")
 
 ## Set variables ---------------------------------------------------------------
 
@@ -42,7 +43,8 @@ if(report_level == "cluster"){
   clusts <- c("Irvine Valley", "Irvine, Kilwinning, Dundonald", "Troon Cluster")
   walk(clusts, ~generate_cluster_profile(.x, profiles))
 }else if(report_level == "practice"){
-  
+  pracs <- unique(profiles$geography_name[profiles$geography_type == "GP Practice"])
+  walk(clusts, ~generate_practice_profile(.x, profiles))
 }else{
   stop('report_level must be either "cluster" or "practice"')
 }
