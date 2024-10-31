@@ -1,6 +1,9 @@
 # Functions
 
 # Cluster Level Profile
+
+
+
 generate_cluster_profile <- function(name, df){
   
   # Extract appropriate board and HSCP to filter comparator data
@@ -12,7 +15,21 @@ generate_cluster_profile <- function(name, df){
            cluster == name |             # Get Practice Data
            geography_name == board |     # Get Board Data
            geography_name == hscp_use |  # Get HSCP Data
-           geography_type == "Scotland") # Get Scotland Data
+           geography_type == "Scotland"  # Get Scotland Data
+           ) %>%  
+    distinct() %>% 
+    mutate(fy_new = case_when(fq == "Q4" ~ fy + 1,
+                              .default = fy),
+           fq_new = as.numeric(str_remove(fq, "Q")) + 1,
+           fq_new = case_when(fq_new == 5 ~ 1,
+                              .default = fq_new),
+           quarter = yq(paste(fy_new, str_remove(fq_new, "Q"))),
+           geography_name = factor(geography_name, 
+                                   levels = c(unique(geography_name[geography_type == "GP Practice"]),
+                                              name,
+                                              hscp_use,
+                                              board,
+                                              "NHS Scotland")))
 
   # Takes the Template document and renders - folder structure needs to be set up in advance  
   rmarkdown::render(input = "Template.Rmd",

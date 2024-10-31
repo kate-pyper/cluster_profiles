@@ -31,6 +31,7 @@ HB <-  c("NHS Ayrshire and Arran",
          "NHS Western Isles",
          "") # need the empty quotes to get Scotland
 
+
 ## Filter Data to relevant health boards ---------------------------------------
 
 profiles <- profiles %>% 
@@ -44,7 +45,7 @@ if(report_level == "cluster"){
   walk(clusts, ~generate_cluster_profile(.x, profiles))
 }else if(report_level == "practice"){
   pracs <- unique(profiles$geography_name[profiles$geography_type == "GP Practice"])
-  walk(clusts, ~generate_practice_profile(.x, profiles))
+  walk(pracs, ~generate_practice_profile(.x, profiles))
 }else{
   stop('report_level must be either "cluster" or "practice"')
 }

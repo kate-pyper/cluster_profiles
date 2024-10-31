@@ -2,7 +2,7 @@
 title: "GP Cluster Profiles"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
+    orientation: rows
     vertical_layout: fill
     css: phs_style.css
 ---
@@ -11,6 +11,31 @@ output:
 library(flexdashboard)
 library(crosstalk)
 library(tidyverse)
+library(plotly)
+library(phsstyles)
+
+clust <- filter(for_clust, geography_type != "GP Practice")
+
+pal_clust <- phs_colors(c("phs-purple", "phs-magenta", "phs-blue", "phs-green"))
+names(pal_clust) <-  unique(clust$geography_name)
+
+# times = 5 allows up to 18 practices (3 colours, 5 line types)
+pal_prac <- rep(phs_colours(rep(c("phs-teal", "phs-liberty", "phs-rust"), times = 6)))
+# extract out only what is needed for the practice in the data set
+pal_prac <- pal_prac[1:length(unique(prac$geography_name[prac$geography_type == "GP Practice"]))]
+names(pal_prac) <- as.character(unique(prac$geography_name[prac$geography_type == "GP Practice"]))
+
+pal_prac <- c(pal_prac, pal_clust)
+
+linetype_prac <- rep(c("solid", "dot", "dash", "longdash", "dashdot", "longdashdot"), each = 3)
+linetype_prac <- linetype_prac[1:length(unique(prac$geography_name[prac$geography_type == "GP Practice"]))]
+names(linetype_prac) <- unique(prac$geography_name[prac$geography_type == "GP Practice"])
+
+linetype_clust <- rep("solid", 4)
+names(linetype_clust) <- unique(clust$geography_name)
+
+linetype_prac <- c(linetype_prac, linetype_clust)
+
 ```
 
 Information {data-icon="fa-info-circle"}
@@ -22,6 +47,8 @@ Notes could either go on this page, or could go on a separate "Notes" Page.
 
 <!-- Cluster Level Tabs -->
 
+
+
 Demographics {data-navmenu="Cluster Level Data" data-navmenu-icon="fa-cogs"}
 ================================================================================
 
@@ -29,6 +56,75 @@ Demographics {data-navmenu="Cluster Level Data" data-navmenu-icon="fa-cogs"}
 Unscheduled Care {data-navmenu="Cluster Level Data"}
 ================================================================================
 
+sidebar {.sidebar}
+--------------------------------------------------------------------------------
+
+```{r create shared data for filters}
+unsched_clust <- filter(clust, domain %in% c("A & E", "ACUTE", "OOH")) %>% 
+  distinct(geography_name, age_band, indicator, quarter, .keep_all = TRUE) %>% 
+  mutate(age_band = factor(age_band, levels = c("All Ages", "Under 65", "65+"))) %>% 
+  arrange(age_band, quarter)
+unsched_clust <- SharedData$new(unsched_clust)
+
+```
+
+```{r crosstalk filters}
+crosstalk::filter_select(
+    id = "Indicator",
+    label = "Indicator",
+    sharedData = unsched_clust,
+    group = ~indicator,
+    multiple = FALSE
+  )
+
+crosstalk::filter_select(
+    id = "Age",
+    label = "Age",
+    sharedData = unsched_clust,
+    group = ~age_band,
+    #selected="All Ages",
+    multiple = FALSE
+  )
+crosstalk::filter_checkbox(
+  id = "Areas",
+  label = "Choose areas to compare",
+  sharedData = unsched_clust,
+  group = ~geography_name
+)
+
+# crosstalk::filter_slider(
+#   "Financial Year", 
+#   "Financial Year", 
+#   fy_shared, 
+#   ~`Financial Year`, 
+#   width = "100%")
+
+```
+
+```{js}
+function filter_default(){
+  document.getElementById("Age").getElementsByClassName("selectized")[0].selectize.setValue("All Ages",false)
+  document.getElementById("Age").getElementsByClassName("selectized")[0].selectize.removeOption("");
+  document.getElementById("Indicator").getElementsByClassName("selectized")[0].selectize.setValue("Att Rate Per 1000 Pop",false)
+  document.getElementById("Indicator").getElementsByClassName("selectized")[0].selectize.removeOption("");
+}
+
+$(document).ready(filter_default);
+```
+
+Row
+--------------------------------------------------------------------------------
+
+### Trend
+
+```{r}
+plot_ly(unsched_clust, 
+        x = ~quarter, 
+        y = ~rate, 
+        color = ~ geography_name, 
+        colors = pal_clust,
+        mode = "lines+markers")
+```
 
 Outpatient Appointments {data-navmenu="Cluster Level Data"}
 ================================================================================
@@ -49,6 +145,81 @@ Demographics {data-navmenu="Practice Level Data" data-navmenu-icon="fa-cog"}
 
 Unscheduled Care {data-navmenu="Practice Level Data"}
 ================================================================================
+
+sidebar {.sidebar}
+--------------------------------------------------------------------------------
+
+```{r}
+
+unsched_prac <- filter(for_clust, domain %in% c("A & E", "ACUTE", "OOH")) %>% 
+  distinct(geography_name, age_band, indicator, quarter, .keep_all = TRUE) %>% 
+  mutate(age_band = factor(age_band, levels = c("All Ages", "Under 65", "65+"))) %>% 
+  arrange(age_band, quarter)
+unsched_prac <- SharedData$new(unsched_prac)
+```
+
+```{r}
+crosstalk::filter_select(
+    id = "Indicator_unsched_prac",
+    label = "Indicator",
+    sharedData = unsched_prac,
+    group = ~indicator,
+    multiple = FALSE
+  )
+
+crosstalk::filter_select(
+    id = "Age_unsched_prac",
+    label = "Age",
+    sharedData = unsched_prac,
+    group = ~age_band,
+    #selected="All Ages",
+    multiple = FALSE
+  )
+crosstalk::filter_checkbox(
+  id = "Areas_unsched_prac",
+  label = "Choose areas to compare",
+  sharedData = unsched_prac,
+  group = ~geography_name
+)
+
+# crosstalk::filter_slider(
+#   "Financial Year", 
+#   "Financial Year", 
+#   fy_shared, 
+#   ~`Financial Year`, 
+#   width = "100%")
+
+```
+
+```{js}
+function filter_default(){
+  document.getElementById("Age_unsched_prac").getElementsByClassName("selectized")[0].selectize.setValue("All Ages",false);
+  document.getElementById("Age_unsched_prac").getElementsByClassName("selectized")[0].selectize.removeOption("");
+  document.getElementById("Indicator_unsched_prac").getElementsByClassName("selectized")[0].selectize.setValue("Att Rate Per 1000 Pop",false);
+  document.getElementById("Indicator_unsched_prac").getElementsByClassName("selectized")[0].selectize.removeOption("");
+  document.getElementById("Areas_unsched_prac").getElementsByClassName("selectized")[0].selectize.setValue("NHS Scotland",false);
+}
+
+$(document).ready(filter_default);
+```
+
+Row
+--------------------------------------------------------------------------------
+
+### Trend
+
+```{r}
+plot_ly(unsched_prac, 
+        x = ~quarter, 
+        y = ~rate, 
+        color = ~ geography_name, 
+        colors = pal_prac,
+        linetype = ~ geography_name,
+        linetypes = linetype_prac,
+        mode = "lines+markers")
+
+
+```
 
 
 Outpatient Appointments {data-navmenu="Practice Level Data"}
