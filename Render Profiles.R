@@ -41,7 +41,8 @@ profiles <- profiles %>%
 ## Generate report -------------------------------------------------------------
 if(report_level == "cluster"){
   #clusts <- unique(profiles$geography_name[profiles$geography_type == "GP Cluster"])
-  clusts <- c("Irvine Valley", "Irvine, Kilwinning, Dundonald", "Troon Cluster")
+  #clusts <- c("Irvine Valley", "Irvine, Kilwinning, Dundonald", "Troon Cluster")
+  clusts <- "East Lothian"
   walk(clusts, ~generate_cluster_profile(.x, profiles))
 }else if(report_level == "practice"){
   pracs <- unique(profiles$geography_name[profiles$geography_type == "GP Practice"])

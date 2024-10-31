@@ -15,6 +15,7 @@ library(plotly)
 library(phsstyles)
 
 clust <- filter(for_clust, geography_type != "GP Practice")
+prac <- filter(for_clust, geography_type == "GP Practice")
 
 pal_clust <- phs_colors(c("phs-purple", "phs-magenta", "phs-blue", "phs-green"))
 names(pal_clust) <-  unique(clust$geography_name)
