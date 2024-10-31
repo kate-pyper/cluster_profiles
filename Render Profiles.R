@@ -11,7 +11,7 @@ source("Render Functions.R")
 # Set report level - can take two values:
 # "cluster" - produces a cluster level dashboard with practice level data for all practice in the cluster
 # "practice" - produces same dashboard but with practice data for only one single practice
-report_level <- "cluster"
+report_level <- "practice"
 
 # Set Health Board that you want to generate profiles for
 # This can be a vector containing multiple health boards
@@ -40,12 +40,13 @@ profiles <- profiles %>%
 
 ## Generate report -------------------------------------------------------------
 if(report_level == "cluster"){
-  #clusts <- unique(profiles$geography_name[profiles$geography_type == "GP Cluster"])
-  #clusts <- c("Irvine Valley", "Irvine, Kilwinning, Dundonald", "Troon Cluster")
-  clusts <- "East Lothian"
+  # clusts <- unique(profiles$geography_name[profiles$geography_type == "GP Cluster"]) # produce all cluster profiles
+  # clusts <- c("Irvine Valley", "Irvine, Kilwinning, Dundonald", "Troon Cluster") # can produce for a subset of clusters
+  # clusts <- "East Lothian" # can produce for a single cluster
   walk(clusts, ~generate_cluster_profile(.x, profiles))
 }else if(report_level == "practice"){
-  pracs <- unique(profiles$geography_name[profiles$geography_type == "GP Practice"])
+  # pracs <- unique(profiles$geography_name[profiles$geography_type == "GP Practice"]) # Produce all practice profiles
+  pracs <- "80787 - LOUDOUN MEDICAL PRACTICE" # can produce for individual practice (or practices if a vector)
   walk(pracs, ~generate_practice_profile(.x, profiles))
 }else{
   stop('report_level must be either "cluster" or "practice"')
